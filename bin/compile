@@ -84,6 +84,7 @@ export LD_LIBRARY_PATH="\$HOME/.heroku/opencv/lib/:\$LD_LIBRARY_PATH"
 export PATH="\$HOME/.heroku/opencv/bin:\$HOME/.heroku/cmake/bin:\$PATH"
 EOF
 
-#deep-mv $BUILD_DIR $ORIG_BUILD_DIR
+deep-cp $BUILD_DIR/.heroku/opencv/lib /app/.heroku/opencv/lib
+deep-cp $BUILD_DIR/.heroku/opencv/bin /app/.heroku/opencv/bin
 
 title "Buildpack installed."
