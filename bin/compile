@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# This script originally modified from Diogo Costa's buildpack
+# diogojc/heroku-buildpack-python-opencv-scipy
+
 title() {
   echo "-----> $*"
 }
@@ -53,49 +56,34 @@ deep-rm() {
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-APP_DIR="/app"
-deep-mv $BUILD_DIR $APP_DIR
-ORIG_BUILD_DIR=$BUILD_DIR
-BUILD_DIR=$APP_DIR
+#APP_DIR="/app"
+#deep-mv $BUILD_DIR $APP_DIR
+#ORIG_BUILD_DIR=$BUILD_DIR
+#BUILD_DIR=$APP_DIR
 cd $BUILD_DIR
 
-unset ATLAS BLAS LAPACK LD_LIBRARY_PATH PATH PYTHONPATH
-export ATLAS="$BUILD_DIR/.heroku/vendor/lib/atlas-base/libatlas.a"
-export BLAS="$BUILD_DIR/.heroku/vendor/lib/atlas-base/atlas/libblas.a"
-export LAPACK="$BUILD_DIR/.heroku/vendor/lib/atlas-base/atlas/liblapack.a"
-export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/python/lib/:$BUILD_DIR/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib/atlas-base:$BUILD_DIR/.heroku/vendor/lib/atlas-base/atlas"
-export PATH="$BUILD_DIR/.heroku/python/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-export PYTHONPATH="$BUILD_DIR/.heroku/python/lib/python2.7/site-packages/:$BUILD_DIR/.heroku/vendor/lib/python2.7/site-packages/"
+export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/opencv/lib/:$LD_LIBRARY_PATH"
+export PATH="$BUILD_DIR/.heroku/opencv/bin:$PATH"
 
 # Setup environment
 mkdir -p $CACHE_DIR
 title "Generating environment"
 if [ ! -f $CACHE_DIR/env.tar.gz ]; then
 	subtitle "Fetching..."
-	curl -s -L "https://db.tt/38ZdLUoQ" > $CACHE_DIR/env.tar.gz
+	wget http://s3.amazonaws.com/test5a9c0284/opencv.env.tgz -O $CACHE_DIR/opencv.env.tgz
 fi
 subtitle "Unpacking..."
-tar -xzf $CACHE_DIR/env.tar.gz -C $BUILD_DIR
+tar zxf $CACHE_DIR/opencv.env.tgz -C $BUILD_DIR
 
-
-# installing application dependencies
-if [ -f $BUILD_DIR/requirements.txt ]; then
-	title "Found requirements.txt, installing dependencies using pip"
-	$BUILD_DIR/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external
-fi
 
 # creating env variables
 title "Creating environment variables."
 mkdir -p $BUILD_DIR/.profile.d
-cat <<EOF >$BUILD_DIR/.profile.d/5251124.sh
-export ATLAS="\$HOME/.heroku/vendor/lib/atlas-base/libatlas.a"
-export BLAS="\$HOME/.heroku/vendor/lib/atlas-base/atlas/libblas.a"
-export LAPACK="\$HOME/.heroku/vendor/lib/atlas-base/atlas/liblapack.a"
-export LD_LIBRARY_PATH="\$HOME/.heroku/python/lib/:\$HOME/.heroku/vendor/lib:\$HOME/.heroku/vendor/lib/atlas-base:\$HOME/.heroku/vendor/lib/atlas-base/atlas:\$LD_LIBRARY_PATH"
-export PATH="\$HOME/.heroku/python/bin:\$PATH"
-export PYTHONPATH="\$HOME/.heroku/python/lib/python2.7/site-packages/:\$HOME/.heroku/vendor/lib/python2.7/site-packages/"
+cat <<EOF >$BUILD_DIR/.profile.d/opencv.sh
+export LD_LIBRARY_PATH="\$HOME/.heroku/opencv/lib/:\$LD_LIBRARY_PATH"
+export PATH="\$HOME/.heroku/opencv/bin:\$HOME/.heroku/cmake/bin:\$PATH"
 EOF
 
-deep-mv $BUILD_DIR $ORIG_BUILD_DIR
+#deep-mv $BUILD_DIR $ORIG_BUILD_DIR
 
 title "Buildpack installed."
