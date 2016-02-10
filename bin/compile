@@ -53,8 +53,12 @@ deep-rm() {
 }
 ###################################
 
-BUILD_DIR=$1
-CACHE_DIR=$2
+# From heroku node buildpack {
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
+# }
 
 #APP_DIR="/app"
 #deep-mv $BUILD_DIR $APP_DIR
@@ -64,11 +68,10 @@ cd $BUILD_DIR
 
 export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/opencv/lib/:$LD_LIBRARY_PATH"
 export PATH="$BUILD_DIR/.heroku/opencv/bin:$PATH"
-export BLARG="blarg"
 
-# Setup environment
+# Set up environment
 mkdir -p $CACHE_DIR
-title "Generating environment"
+title "Generating build environment"
 if [ ! -f $CACHE_DIR/env.tar.gz ]; then
 	subtitle "Fetching..."
 	wget -nv http://s3.amazonaws.com/test5a9c0284/opencv.env.tgz -O $CACHE_DIR/opencv.env.tgz
@@ -76,16 +79,22 @@ fi
 subtitle "Unpacking..."
 tar zxf $CACHE_DIR/opencv.env.tgz -C $BUILD_DIR
 
+# Environment for later buildpacks
+subtitle "Creating environment variables"
+echo "export PATH=\"$BUILD_DIR/.heroku/opencv/bin:\$PATH\"" > $BP_DIR/export
+echo "export OPENCV_ROOT=\"$BUILD_DIR/.heroku/opencv\"" >> $BP_DIR/export
+echo "export BLARG=\"blarg\"" >> $BP_DIR/export
 
-# creating env variables
-title "Creating environment variables."
+# Runtime environment
+title "Setting up OpenCV runtime environment"
+deep-cp $BUILD_DIR/.heroku/opencv/lib /app/.heroku/opencv/lib
+deep-cp $BUILD_DIR/.heroku/opencv/bin /app/.heroku/opencv/bin
+
+subtitle "Creating environment variables"
 mkdir -p $BUILD_DIR/.profile.d
 cat <<EOF >$BUILD_DIR/.profile.d/opencv.sh
 export LD_LIBRARY_PATH="\$HOME/.heroku/opencv/lib/:\$LD_LIBRARY_PATH"
 export PATH="\$HOME/.heroku/opencv/bin:\$HOME/.heroku/cmake/bin:\$PATH"
 EOF
-
-deep-cp $BUILD_DIR/.heroku/opencv/lib /app/.heroku/opencv/lib
-deep-cp $BUILD_DIR/.heroku/opencv/bin /app/.heroku/opencv/bin
 
 title "Buildpack installed."
