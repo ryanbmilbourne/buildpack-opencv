@@ -85,6 +85,8 @@ echo "export PATH=\"$BUILD_DIR/.heroku/opencv/bin:\$PATH\"" > $BP_DIR/export
 echo "export OPENCV_ROOT=\"$BUILD_DIR/.heroku/opencv\"" >> $BP_DIR/export
 echo "export BLARG=\"blarg\"" >> $BP_DIR/export
 pwd
+echo BUILD_DIR=$BUILD_DIR
+echo BP_DIR=$BP_DIR
 ls -l $BP_DIR
 
 # Runtime environment
