@@ -84,6 +84,8 @@ subtitle "Creating environment variables"
 echo "export PATH=\"$BUILD_DIR/.heroku/opencv/bin:\$PATH\"" > $BP_DIR/export
 echo "export OPENCV_ROOT=\"$BUILD_DIR/.heroku/opencv\"" >> $BP_DIR/export
 echo "export BLARG=\"blarg\"" >> $BP_DIR/export
+pwd
+ls -l $BP_DIR
 
 # Runtime environment
 title "Setting up OpenCV runtime environment"
