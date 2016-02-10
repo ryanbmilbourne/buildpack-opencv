@@ -70,7 +70,7 @@ mkdir -p $CACHE_DIR
 title "Generating environment"
 if [ ! -f $CACHE_DIR/env.tar.gz ]; then
 	subtitle "Fetching..."
-	wget http://s3.amazonaws.com/test5a9c0284/opencv.env.tgz -O $CACHE_DIR/opencv.env.tgz
+	wget -nv http://s3.amazonaws.com/test5a9c0284/opencv.env.tgz -O $CACHE_DIR/opencv.env.tgz
 fi
 subtitle "Unpacking..."
 tar zxf $CACHE_DIR/opencv.env.tgz -C $BUILD_DIR
