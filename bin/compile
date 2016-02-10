@@ -88,6 +88,7 @@ pwd
 echo BUILD_DIR=$BUILD_DIR
 echo BP_DIR=$BP_DIR
 ls -l $BP_DIR
+cat $BP_DIR/export
 
 # Runtime environment
 title "Setting up OpenCV runtime environment"
