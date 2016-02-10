@@ -53,23 +53,19 @@ deep-rm() {
 }
 ###################################
 
-# From heroku node buildpack {
+# From heroku node buildpack
+#######
 BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
-# }
+#######
 
-#APP_DIR="/app"
-#deep-mv $BUILD_DIR $APP_DIR
-#ORIG_BUILD_DIR=$BUILD_DIR
-#BUILD_DIR=$APP_DIR
 cd $BUILD_DIR
 
-export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/opencv/lib/:$LD_LIBRARY_PATH"
 export PATH="$BUILD_DIR/.heroku/opencv/bin:$PATH"
 
-# Set up environment
+# Set up build environment
 mkdir -p $CACHE_DIR
 title "Generating build environment"
 if [ ! -f $CACHE_DIR/env.tar.gz ]; then
@@ -79,16 +75,13 @@ fi
 subtitle "Unpacking..."
 tar zxf $CACHE_DIR/opencv.env.tgz -C $BUILD_DIR
 
-# Environment for later buildpacks
 subtitle "Creating environment variables"
-echo "export PATH=\"$BUILD_DIR/.heroku/opencv/bin:\$PATH\"" > $BP_DIR/export
-echo "export OPENCV_ROOT=\"$BUILD_DIR/.heroku/opencv\"" >> $BP_DIR/export
-echo "export BLARG=\"blarg.cc\"" >> $BP_DIR/export
-pwd
-echo BUILD_DIR=$BUILD_DIR
-echo BP_DIR=$BP_DIR
-ls -l $BP_DIR
-cat $BP_DIR/export
+# These variables are available to later buildpacks
+cat <<EOF >$BP_DIR/export
+export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/opencv/lib/:$LD_LIBRARY_PATH"
+export PATH="$BUILD_DIR/.heroku/opencv/bin:$PATH"
+export OPENCV_ROOT="$BUILD_DIR/.heroku/opencv"
+EOF
 
 # Runtime environment
 title "Setting up OpenCV runtime environment"
@@ -96,6 +89,7 @@ deep-cp $BUILD_DIR/.heroku/opencv/lib /app/.heroku/opencv/lib
 deep-cp $BUILD_DIR/.heroku/opencv/bin /app/.heroku/opencv/bin
 
 subtitle "Creating environment variables"
+# These variables are available in the runtime environment
 mkdir -p $BUILD_DIR/.profile.d
 cat <<EOF >$BUILD_DIR/.profile.d/opencv.sh
 export LD_LIBRARY_PATH="\$HOME/.heroku/opencv/lib/:\$LD_LIBRARY_PATH"
