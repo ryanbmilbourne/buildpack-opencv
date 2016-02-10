@@ -2,8 +2,8 @@
 
 Steve Marschner, February 2016
 
-This buildpack provides a basic installation of OpenCV that can be used in compiling C++ code 
-in later buildpacks and running it in the application.  In particular, it is designed to support
+This buildpack provides a basic installation of OpenCV that can be used to compile C++ code 
+in later buildpacks and run it in the application.  In particular, it is designed to support
 C++ addons compiled by the standard Node.js buildpack.
 
 The buildpack works by unpacking an image of OpenCV that is stored on S3, and setting up the 
