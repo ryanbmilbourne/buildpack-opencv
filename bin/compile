@@ -64,7 +64,7 @@ cd $BUILD_DIR
 
 export LD_LIBRARY_PATH="$BUILD_DIR/.heroku/opencv/lib/:$LD_LIBRARY_PATH"
 export PATH="$BUILD_DIR/.heroku/opencv/bin:$PATH"
-export CXX="$CXX -v"
+export CXX="blarg"
 
 # Setup environment
 mkdir -p $CACHE_DIR
