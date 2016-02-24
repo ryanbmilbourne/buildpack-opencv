@@ -12,17 +12,28 @@ required environment variables for it to be used by later buildpacks and at run 
 ## Creating the OpenCV image
 
 The image is created by building OpenCV from source in a Heroku one-off shell running in an 
-app that has the Python buildpack installed (to support `awscli`).  Then it is tarred up and
+app that has the Python buildpack installed.  This is set up by running:
+
+```
+heroku create --buildpack https://github.com/computationaltextiles/ct-buildpack-python-opencv.git
+heroku config:set AWS_ACCESS_KEY_ID=<key>
+heroku config:set AWS_SECRET_ACCESS_KEY=<secret>
+git push heroku master
+heroku run bash
+```
+
+Then the build is performed (TODO: make this a script).
+Then the opencv directory, plus the files it
+adds to the Python directory, is tarred up and
 uploaded to S3.  The following commands are what I used:
 
 ```
-pip install awscli
-aws configure
+pip install numpy
 wget https://github.com/Itseez/opencv/archive/2.4.11.zip
-wget https://cmake.org/files/v3.5/cmake-3.5.0-rc1-Linux-x86_64.tar.gz
 unzip 2.4.11.zip && rm 2.4.11.zip
-mkdir .heroku/cmake
+wget https://cmake.org/files/v3.5/cmake-3.5.0-rc1-Linux-x86_64.tar.gz
 tar zxf cmake-3.5.0-rc1-Linux-x86_64.tar.gz && rm cmake-3.5.0-rc1-Linux-x86_64.tar.gz
+mkdir .heroku/cmake
 mv cmake-3.5.0-rc1-Linux-x86_64/bin .heroku/cmake
 mv cmake-3.5.0-rc1-Linux-x86_64/share .heroku/cmake
 cd opencv-2.4.11/
@@ -30,8 +41,8 @@ cd opencv-2.4.11/
 make
 make install
 cd ..
-tar zcf opencv.env.tgz .heroku/opencv .heroku/cmake
-aws s3 cp opencv.env.tgz s3://test5a9c0284/opencv.env.tgz
+tar zcf opencv.env.tgz .heroku/opencv .heroku/cmake .heroku/python/lib/python2.7/site-packages/numpy .heroku/python/lib/python2.7/site-packages/cv*
+aws s3 cp opencv.env.tgz s3://test5a9c0284/runtimes/opencv.env.tgz
 ```
 
 Then I set that file to be public via the S3 console, since the buildpack just downloads it without
