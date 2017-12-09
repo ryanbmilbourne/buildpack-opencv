@@ -96,6 +96,6 @@ export LD_LIBRARY_PATH="\$HOME/.heroku/opencv/lib/:\$LD_LIBRARY_PATH"
 export PATH="\$HOME/.heroku/opencv/bin:\$HOME/.heroku/cmake/bin:\$PATH"
 EOF
 
-echo "export PKG_CONFIG_PATH=\"$BUILD_DIR/.heroku/opencv/lib/pkgconfig:\$PKG_CONFIG_PATH\" >> $BP_DIR/export
+echo "export PKG_CONFIG_PATH=\"$BUILD_DIR/.heroku/opencv/lib/pkgconfig:\$PKG_CONFIG_PATH\"" >> $BP_DIR/export
 echo "BUILD_DIR ($BUILD_DIR)"
 title "Buildpack installed."
